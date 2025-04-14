@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Professionalism Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* style.css - Basic Styling (Tailwind CSS is also included for easier styling) */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font via Tailwind */
+        }
+
+        .quiz-container {
+            /* Container styling is handled by Tailwind classes */
+        }
+
+        #options button {
+            /* Basic button styling - mostly handled by Tailwind */
+            width: 100%;
+            text-align: left;
+            padding: 12px 15px;
+            border: 1px solid #d1d5db; /* gray-300 */
+            background-color: #ffffff; /* white */
+            border-radius: 0.375rem; /* rounded-md */
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #options button:hover:not(:disabled) {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+
+        /* Correct/Incorrect styles */
+        .correct {
+            background-color: #90EE90 !important; /* Light Green */
+            color: black !important;
+            border-color: #22c55e !important; /* green-500 */
+        }
+
+        .incorrect {
+           background-color: #F08080 !important; /* Light Coral */
+           color: black !important;
+           border-color: #ef4444 !important; /* red-500 */
+        }
+
+        .option-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #next-button.hidden,
+        #final-score-area.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
+
+    <div class="quiz-container bg-white p-6 md:p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-center text-gray-800">ENR3001 Exam</h1>
+
+        <div id="quiz-area">
+            <div id="progress" class="text-sm text-gray-600 mb-2 text-right">Question 1 of X</div>
+            <div id="question" class="text-lg font-semibold mb-5 text-gray-900">Loading question...</div>
+
+            <div id="options" class="space-y-3 mb-5">
+                </div>
+
+            <div id="feedback" class="mt-4 text-md font-medium h-6"></div>
+            <div id="explanation" class="mt-2 text-sm text-gray-700 italic"></div>
+
+            <button id="next-button" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-200 hidden">
+                Next Question
+            </button>
+        </div>
+
+        <div id="final-score-area" class="text-center hidden">
+            <h2 class="text-xl font-bold mb-3 text-gray-800">Quiz Finished!</h2>
+            <p id="final-score" class="text-lg mb-4 text-gray-700">Your final score is X out of Y.</p>
+            <p id="final-percentage" class="text-lg mb-4 text-gray-700">Percentage: Z%</p>
+            <button id="restart-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-200">
+                Restart Quiz
+            </button>
+        </div>
+
+         <div id="score-display" class="mt-6 text-center text-lg font-medium text-gray-700">Score: 0</div>
+    </div>
+
+    <script>
+        // --- Start of Embedded JavaScript ---
+
+        // --- Data Structure for Questions (Converted from Python) ---
+        const quizData = [
+            // --- Section 1: Ethics 1 ---
+            {
+                question: "Which of the following best explains why it is important to study engineering ethics?",
+                options: { A: "The Engineer should know about the laws that apply to the products they design", B: "The Engineer has a responsibility for the proftability and success of the company they work for", C: "The Engineer has a responsibility for the well‐being of the public", D: "The Engineer should be a moral person" },
+                correct: 'C', explanation: null
+            },
+            {
+                question: "Which ethical theory is also known as deontological ethics?",
+                options: { A: "Utilitarianism", B: "Duty ethics", C: "Rights ethics", D: "Virtue ethics" },
+                correct: 'B', explanation: null
+            },
+            {
+                question: "In utilitarianism, which one of the below has the highest priority?",
+                options: { A: "Rights of individuals", B: "Personal virtues", C: "Social benefts", D: "Rules and obligations" },
+                correct: 'C', explanation: null
+            },
+            {
+                question: "In the context of Engineering Ethics, which of the following defnes a whistleblower?",
+                options: { A: "A person that reveals errors in a system", B: "A person who blows through a restriction in order to create a sound", C: "A person who exposes an unlawful or immoral activity in an organization", D: "A person that controls information flow" },
+                correct: 'C', explanation: null
+            },
+            {
+                question: "Which of the following best defnes “Rights ethics”?",
+                options: { A: "A right choice is one that maximizes the well‐being of society as a whole", B: "A right choice is one that follows ethical rules", C: "A right choice is one that protects the rights of individuals", D: "A right choice is one that supports good character traits" },
+                correct: 'C', explanation: null
+            },
+            {
+                question: "Which of the following best defnes “Utilitarianism”?",
+                options: { A: "A right choice is one that maximizes the well‐being of society as a whole", B: "A right choice is one that follows ethical rules", C: "A right choice is one that protects the rights of individuals", D: "A right choice is one that supports good character traits" },
+                correct: 'A', explanation: null
+            },
+            {
+                question: "Which of the following best defnes “Virtue Ethics”?",
+                options: { A: "A right choice is one that maximizes the well‐being of society as a whole", B: "A right choice is one that follows ethical rules", C: "A right choice is one that protects the rights of individuals", D: "A right choice is one that supports good character traits" },
+                correct: 'D', explanation: null
+            },
+            {
+                question: "Which of the following best defnes “Duty ethics”?",
+                options: { A: "A right choice is one that maximizes the well‐being of society as a whole", B: "A right choice is one that follows ethical rules", C: "A right choice is one that protects the rights of individuals", D: "A right choice is one that supports good character traits" },
+                correct: 'B', explanation: null
+            },
+            {
+                question: "Which of the following does the social contract refer to?",
+                options: { A: "Socialising with employees in the company", B: "Designing products for society to use", C: "Considering the well‐being of the public", D: "Contracting work to members of the public" },
+                correct: 'C', explanation: null
+            },
+            {
+                question: "Which one of the following best explains why cheating in an exam is unethical from the “rights ethics” view point?",
+                options: { A: "Students who don't cheat are more likely to learn the subject", B: "Students who cheat are more likely to get relatively higher grades", C: "Students who don't cheat are more likely to get relatively lower grades (due to unfair advantage of cheaters)", D: "Students who cheat are less likely to learn the subject" },
+                correct: 'C', explanation: "Rights ethics focuses on fairness and the rights of individuals. Cheating violates the rights of non-cheating students to a fair assessment."
+            },
+            {
+                question: "Professional ethics is not related with:",
+                options: { A: "Rights of individuals", B: "The well‐being of the public", C: "Financial profts", D: "Safety" },
+                correct: 'C', explanation: "While profitability is important for a business, it's not a core component of professional *ethics*, which prioritize public well-being, safety, and rights."
+            },
+            {
+                question: "Professional ethics is not related with:",
+                options: { A: "Ethical culture of the organization", B: "Laws and regulations", C: "Personal beliefs and religion", D: "Code of ethics of the company" },
+                correct: 'C', explanation: "Professional ethics are generally secular and based on shared professional standards, not individual religious or personal beliefs."
+            },
+            {
+                question: "Which one of the jobs below is not a profession?",
+                options: { A: "Pharmacist", B: "Doctor", C: "Cashier", D: "Engineer" },
+                correct: 'C', explanation: "Professions typically require specialized knowledge, judgment, adherence to ethical codes, and often have professional bodies."
+            },
+            {
+                question: "An occupation or a job can also be called a profession if it possesses a number of essential attributes. Which one of the below is not one of these attributes?",
+                options: { A: "Work that requires a high level of skill and the use of judgment", B: "Special organizations that are controlled by members of the profession to set standards of admission, conduct, and enforcement", C: "Work for hire regardless of the required skill level or responsibilities", D: "Signifcant contribution to society" },
+                correct: 'C', explanation: "Option C describes general employment, not the specific characteristics that define a profession."
+            },
+            {
+                question: "What is the most fundamental right of an engineer?",
+                options: { A: "The right of disclosing proprietary information", B: "The right of keeping wrongdoings of close friends confdential", C: "The right of refusing to engage in unethical behaviour", D: "The right of whistle‐blowing" },
+                correct: 'C', explanation: "The core ethical duty is to act ethically, which includes refusing to participate in unethical acts."
+            },
+            {
+                question: "There are three conditions for whistleblowing to be an acceptable action. Which of the below is not one of those conditions?",
+                options: { A: "Need: there must be a clear harm that can be avoided", B: "Proximity: you must be in a good position to report the problem", C: "Beneft: the result must be benefcial for the company or organization", D: "Last resort: you must have tried all other channels to solve the problem" },
+                correct: 'C', explanation: "Whistleblowing is justified by preventing harm, not necessarily by benefiting the organization (which might even suffer reputational damage)."
+            },
+            {
+                question: "Which one of the actions below is not a proper way of preventing whistleblowing in a company?",
+                options: { A: "Providing rules and guidelines to help employees and management follow correct procedures", B: "Providing training to improve the capability of employees and management and encouraging an understanding of ethical issues", C: "Encouraging good working relationships between employees and management including transparent governance", D: "Punishing employees when they report ethical problems" },
+                correct: 'D', explanation: "Punishing reporters creates a culture of fear and discourages ethical reporting, potentially leading to more whistleblowing or hidden problems."
+            },
+            {
+                question: "There are four elements for creating an ethical culture within an organization. Which of the below is not one of those elements?",
+                options: { A: "A written code of ethics", B: "Ethics training for executives, managers, and employees", C: "A punishment system to avoid whistleblowing", D: "The availability of ethical advice (e.g. advice lines or ofces)" },
+                correct: 'C', explanation: "An ethical culture encourages reporting issues through proper channels, it doesn't seek to punish whistleblowers."
+            },
+            {
+                question: "A corporation has many responsibilities. Which of the following is least related to ethics?",
+                options: { A: "The legal responsibility to obey the laws set by society", B: "The ethical responsibility to do what is right even when not compelled by law", C: "The economic responsibility to be proftable", D: "The philanthropic responsibility to contribute resources to improve quality of life" },
+                correct: 'C', explanation: "While necessary for survival, the core drive for profit is primarily economic, whereas the others directly involve legal, ethical, or social considerations."
+            },
+            {
+                question: "Ethics is important in the following industry:",
+                options: { A: "The health sector", B: "Engineering", C: "The education sector", D: "All of the above" },
+                correct: 'D', explanation: "Ethics is crucial in all fields that impact people's lives and well-being."
+            },
+            // --- Section 2: Ethics 2 ---
+            { question: "What category of accident is an automatic braking system designed to reduce?", options: { A: "Procedural accidents", B: "Engineering accidents", C: "Systemic accidents", D: "None of the above" }, correct: 'A', explanation: "Automatic systems often aim to mitigate human error, which falls under procedural issues." },
+            { question: "Which of the following does not describe a hazard?", options: { A: "The probability of a bridge breaking under the load of a heavy truck", B: "A large unmarked hole in a road", C: "An unshielded radioactive source", D: "A high voltage terminal that can be touched by a child" }, correct: 'A', explanation: "A hazard is a potential source of harm (B, C, D). Probability (A) is a component of risk, not the hazard itself." },
+            { question: "Which of the following decreases the risk of driving?", options: { A: "Driving more", B: "Wearing a seat belt", C: "Using a phone while driving", D: "Driving with faulty brakes" }, correct: 'B', explanation: "Wearing a seat belt reduces the severity of harm in an accident, thus decreasing overall risk." },
+            { question: "Which of the following best defnes risk?", options: { A: "The sum of the hazard and the severity of the harm", B: "The product of the hazard and the severity of the harm", C: "The potential source of harm", D: "The product of the probability of the harm and the severity of the harm" }, correct: 'D', explanation: "Risk is commonly calculated as Probability x Severity." },
+            { question: "Which of the following best describes how a product can be determined to be safe for the public to use?", options: { A: "Rigorously test the product under a wide variety of operational conditions", B: "The product refects current engineering standards", C: "Alternative designs were considered and the current design is the safest", D: "The product complies with the law (local, national, and international)" }, correct: 'A', explanation: "While B, C, and D are important aspects, rigorous testing (A) under diverse conditions is the most direct way to assess safety in practice." },
+            { question: "Assume that for a Ford Pinto there is a 1% chance (per year) of having an accident involving a strong rear collision, 1% of those result in a fre, and 1% of the fres result in an occupant death. Then what is the probability of death for a Pinto owner who drives the car for one year?", options: { A: "1 per cent (0.01)", B: "1 in a million (0.000001)", C: "1 in ten thousand (0.0001)", D: "1 in a hundred thousand (0.00001)" }, correct: 'B', explanation: "Probability = P(collision) * P(fire | collision) * P(death | fire) = 0.01 * 0.01 * 0.01 = 0.000001 or 1 in a million." },
+            { question: "Safety can approximately be defned as:", options: { A: "Probability of an adverse event", B: "State of being protected from risk", C: "Possibility of harm", D: "Severity of harm" }, correct: 'B', explanation: "Safety implies a low level of risk or protection from it." },
+            { question: "Which statement proposed below is incorrect?", options: { A: "Perceived risk is bigger if the risk is taken involuntarily", B: "A risk that is delayed is perceived as smaller", C: "A voluntary risk is perceived as a bigger risk", D: "If a risk is irreversible, it is perceived to be bigger" }, correct: 'C', explanation: "Voluntary risks (like skiing) are often perceived as smaller or more acceptable than involuntary risks (like pollution)." },
+            { question: "To maximise the safety of a product, the designer should follow fve major steps. Which one of the below is not one of these steps?", options: { A: "Comply with the law", B: "Consider alternative designs", C: "Foresee potential misuse", D: "Estimate the price of the product" }, correct: 'D', explanation: "While price is a design constraint, it's not a primary step specifically for *maximizing safety*." },
+            { question: "In 1980, NORAD reported that the US was under missile attack. The problem was caused by a faulty circuit. Which of the following classifes this type of accident?", options: { A: "Procedural accident", B: "Engineering accident", C: "Systemic accident", D: "None of the above" }, correct: 'B', explanation: "A faulty circuit is a failure in the engineered design or component." },
+            { question: "What is the major reason for global warming in recent times?", options: { A: "Increasing proportion of greenhouse gases in the atmosphere", B: "Decreasing ozone level in the atmosphere", C: "Using natural gas instead of coal as fuel in powerplants", D: "Increasing use of renewable energy resources" }, correct: 'A', explanation: "Greenhouse gases trap heat, leading to global warming." },
+            { question: "Which one of the following is not the result of human activity?", options: { A: "Deforestation", B: "Volcanic eruption", C: "Acid rain", D: "Pollution" }, correct: 'B', explanation: "Volcanic eruptions are natural geological events." },
+            { question: "Environmental ethics is the part of environmental philosophy which considers extending the traditional boundaries of ethics to include:", options: { A: "Animals", B: "The non‐human world", C: "Outer space", D: "Plants" }, correct: 'B', explanation: "Environmental ethics broadly considers moral standing for the non-human environment, including animals, plants, ecosystems, etc." },
+            { question: "The approach to ethics that assumes “ethics should and do vary with social/cultural context” is known as:", options: { A: "Ethical culture", B: "Ethical worldview", C: "Anthropocentric ethics", D: "Ethical relativism" }, correct: 'D', explanation: "Ethical relativism posits that morality is relative to cultural or individual perspectives." },
+            { question: "Which concept in traditional ethics is described as “Humans are the most important species, they have higher value and moral status than animals, we protect that which is useful to us”?", options: { A: "Ethical Relativism", B: "Sentience", C: "Anthropocentric ethics", D: "Environmental ethics" }, correct: 'C', explanation: "Anthropocentrism places humans at the center of moral consideration." },
+            { question: "In the historical evolution of ethical thinking, which option below has the correct chronological order in terms of what is included in the context of ethics (expanding circle of moral concern)?", options: { A: "Self–Nation–Humans–Animals/Environment", B: "Nation–Humans–Self–Animals/Environment", C: "Humans–Animals/Environment–Self–Nation", D: "Self–Animals/Environment–Nation–Humans" }, correct: 'A', explanation: "Ethical consideration historically expanded from the self/family to larger groups like nation, then humanity, and more recently to non-human animals and the environment." },
+            { question: "Which theory best describes the cost–beneft approach to environmental ethics?", options: { A: "Utilitarianism", B: "Rights ethics", C: "Duty ethics", D: "Virtue ethics" }, correct: 'A', explanation: "Utilitarianism focuses on maximizing overall good (benefits minus costs)." },
+            { question: "Which theory best describes the cost–oblivious approach to environmental ethics (i.e., protecting the environment regardless of cost)?", options: { A: "Utilitarianism", B: "Rights ethics", C: "Duty ethics", D: "Virtue ethics" }, correct: 'C', explanation: "Duty (deontological) ethics focuses on obligations and rules, which might dictate environmental protection irrespective of cost-benefit analysis. Rights ethics could also apply if the environment is seen as having rights." },
+            { question: "For an action to be environmentally ethical, it should:", options: { A: "Increase human population", B: "Keep national interests paramount", C: "Consider the intrinsic value or rights of the environment / minimize harm", D: "Comply with environmental laws and regulations" }, correct: 'C', explanation: "True environmental ethics often goes beyond mere compliance (D) or cost-benefit (original C), considering the inherent value of the environment or minimizing harm." },
+            { question: "Sentience can be best described as:", options: { A: "The ability to write", B: "The ability to reason", C: "The ability to suffer", D: "The ability to smell" }, correct: 'C', explanation: "Sentience refers to the capacity to feel, perceive, or experience subjectively, often including the capacity to suffer or feel pleasure." },
+            // --- Section 3: Project Management ---
+            { question: "Which of the following is not considered as a characteristic of a project?", options: { A: "Clear objective", B: "Defned life span", C: "Only for internal use", D: "Utilization of resources", E: "Uniqueness" }, correct: 'C', explanation: "Projects can be for internal or external clients/stakeholders." },
+            { question: "Which of the following is not one of the stages of a project life cycle?", options: { A: "Conceptualizing/Initiating", B: "Planning", C: "Executing", D: "Delivering/Closing", E: "Monitoring & Controlling" }, correct: 'E', explanation: "Common project life cycle stages are Initiation, Planning, Execution, Monitoring & Controlling, and Closure. 'Defining' is typically part of Initiation/Planning." },
+            { question: "From among the following activities, which is the best example of a project?", options: { A: "Routine production of a car model", B: "Practicing a musical instrument", C: "Taking notes", D: "Writing a journal article", E: "All of the above" }, correct: 'D', explanation: "Writing an article is unique, has a defined start/end, objective, and uses resources. A, B, C are typically ongoing or routine tasks." },
+            { question: "In which stage of the project life cycle are project goals established, tasks specifed, and responsibilities assigned?", options: { A: "Defning", B: "Planning", C: "Executing", D: "Delivering", E: "None of the above" }, correct: 'B', explanation: "These activities are characteristic of the Planning phase." },
+            { question: "In which stage of the project life cycle are you more likely to fnd status reports, changes, and forecasts?", options: { A: "Defning", B: "Planning", C: "Executing", D: "Delivering", E: "None of the above" }, correct: 'C', explanation: "These are common elements of managing and monitoring the project during the Execution phase (and Monitoring & Controlling)." },
+            { question: "The process of defning, planning, executing, and delivering within a specifed time frame is:", options: { A: "Process lifecycle", B: "Leadership", C: "Responsibility matrix", D: "Project life cycle", E: "Statement of work" }, correct: 'D', explanation: "This describes the overall flow of a project through its life cycle stages." },
+            { question: "Forward pass of network computations determines the early start and fnish times.", options: { A: "TRUE", B: "FALSE" }, correct: 'A', explanation: "The forward pass calculates the earliest possible start and finish dates for each activity." },
+            { question: "Backward pass of network computations determines the late start and fnish times.", options: { A: "TRUE", B: "FALSE" }, correct: 'A', explanation: "The backward pass calculates the latest allowable start and finish dates without delaying the project." },
+            { question: "Which of the following is not a cause for project failure?", options: { A: "Selection of an unsound project", B: "Selecting the wrong person as a project manager", C: "Lack of support from upper management", D: "Appropriate use of management techniques", E: "Project termination not planned" }, correct: 'D', explanation: "Appropriate use of techniques contributes to success, not failure." },
+            { question: "Which of the following outcomes is not a reason for project success?", options: { A: "Completed on time", B: "Within budget", C: "Below the desired performance level", D: "Efcient and effective utilization of resources", E: "Satisfes the stakeholders" }, correct: 'C', explanation: "Meeting performance/quality requirements is crucial for success." },
+            { question: "From among the following characteristics, which does not have a major contribution to making an effective project team?", options: { A: "Ideal and complementary skill set", B: "Clear and common goal", C: "Clear defnition of responsibility", D: "Support from senior management", E: "Friendly relations" }, correct: 'E', explanation: "While helpful, friendly relations are less critical than clear goals, skills, responsibilities, and support for team effectiveness." },
+            { question: "An expected output over the life of a project would be classifed as:", options: { A: "A deliverable", B: "A product", C: "An end object", D: "An objective", E: "A target" }, correct: 'A', explanation: "Deliverables are the tangible or intangible outputs produced by the project." },
+            { question: "Which of the following is not one of the basic classifcations of project priorities (constraints)?", options: { A: "Proft", B: "Cost", C: "Time", D: "Scope", E: "All of the above are basic classifcations" }, correct: 'A', explanation: "The classic 'triple constraint' is Time, Cost, and Scope (often with Quality added). Profit is a business goal, not a fundamental project constraint itself." },
+            { question: "The lowest level in the hierarchical breakdown of the WBS is:", options: { A: "A work package", B: "Sub deliverables", C: "A cost account", D: "Major deliverables", E: "The project" }, correct: 'A', explanation: "Work packages are the smallest units of work in a Work Breakdown Structure (WBS) that can be scheduled, costed, and assigned." },
+            { question: "Which of the following represents an activity on an AON project network?", options: { A: "An arrow", B: "A line", C: "A node", D: "Both A and B are correct", E: "A, B, and C are all correct" }, correct: 'C', explanation: "In Activity-On-Node (AON) diagrams, activities are represented by nodes (boxes), and arrows show dependencies." },
+            { question: "A sequence of connected, dependent activities is defned as:", options: { A: "Critical path", B: "Parallel path", C: "Activity chain", D: "Path", E: "Dependent chain" }, correct: 'D', explanation: "Any sequence of connected activities in a network diagram is a path. The critical path is the longest path." },
+            { question: "Which of the following is not one of the basic rules to follow when developing project networks?", options: { A: "The fow is from left to right", B: "There is a starting node and an ending node for each network", C: "Each activity should have a unique label", D: "The label of each activity should be larger than any activity preceding it", E: "For an activity to begin, all the preceding activities should be completed" }, correct: 'D', explanation: "Activity labels (names or IDs) need to be unique but don't follow a numerical/alphabetical sequence rule based on predecessors." },
+            // --- Section 4: Risk Management ---
+            { question: "Which of the following risks is the failure of a purchased component to perform as expected?", options: { A: "Product risk", B: "Project risk", C: "Business risk", D: "Programming risk" }, correct: 'A', explanation: "This relates directly to the quality or performance of the product/system being built." },
+            { question: "Which term best defnes the statement “There will be a change of organizational management with different priorities”?", options: { A: "Staff turnover", B: "Technology change", C: "Management change", D: "Product competition" }, correct: 'C', explanation: "This directly describes a change in management." },
+            { question: "Which term best defnes the statement “The underlying technology on which the system is built is superseded by new technology”?", options: { A: "Technology change", B: "Product competition", C: "Requirements change", D: "None of the mentioned" }, correct: 'A', explanation: "This describes obsolescence due to technological advancements." },
+            { question: "What process involves assessing the risk, planning for risk mitigation, and revising those plans as more is learned about the risk?", options: { A: "Risk monitoring", B: "Risk planning", C: "Risk analysis", D: "Risk identifcation" }, correct: 'A', explanation: "Risk monitoring involves tracking identified risks, implementing response plans, and identifying new risks throughout the project." },
+            { question: "Which of the following risks are derived from the organizational environment where the project is developed?", options: { A: "People risks", B: "Technology risks", C: "Estimation risks", D: "Organizational risks" }, correct: 'D', explanation: "Organizational risks stem from factors like management changes, funding issues, or conflicting priorities within the organization." },
+            { question: "What must be identifed as part of risk identifcation?", options: { A: "Threats", B: "Vulnerabilities", C: "Consequences", D: "All of the mentioned" }, correct: 'D', explanation: "Effective risk identification involves understanding the potential threats, the vulnerabilities they exploit, and the potential consequences." },
+            { question: "Which of the following risks are derived from the software or hardware technologies used to develop the system?", options: { A: "Managerial risks", B: "Technology risks", C: "Estimation risks", D: "Organizational risks" }, correct: 'B', explanation: "Technology risks relate to the tools, platforms, and components being used." },
+            { question: "Which strategy means that the impact of the risk will be reduced?", options: { A: "Avoidance strategies", B: "Minimization strategies (Mitigation)", C: "Contingency plans", D: "All of the above" }, correct: 'B', explanation: "Minimization or Mitigation strategies aim to reduce the probability or impact of a risk." },
+            { question: "Which one is not a risk management activity?", options: { A: "Risk assessment", B: "Risk generation", C: "Risk control", D: "None of the mentioned" }, correct: 'B', explanation: "Risk management involves identifying, assessing, planning for, and controlling risks, not generating them." },
+            { question: "What is defned as the product of the probability of incurring a loss and the potential magnitude of that loss?", options: { A: "Risk exposure", B: "Risk prioritization", C: "Risk analysis", D: "All of the mentioned" }, correct: 'A', explanation: "Risk Exposure = Probability x Impact (Magnitude of Loss)." },
+            { question: "Which of the following is not a business risk?", options: { A: "Building an excellent product or system that no one really wants", B: "Losing the support of senior management due to a change in focus or personnel", C: "Lack of documented requirements or project scope", D: "Losing budgetary or personnel commitment" }, correct: 'C', explanation: "Lack of documented requirements (C) is primarily a *project* risk affecting execution, while A, B, and D relate more broadly to the business context and viability." },
+            { question: "Which risks are associated with constraints imposed by management or the marketplace?", options: { A: "Business impact risks", B: "Process defnition risks", C: "Product size risks", D: "Development environment risks" }, correct: 'A', explanation: "These external or high-level constraints directly impact the business case or feasibility of the project." },
+            { question: "Risk projection (or analysis) attempts to rate each risk in two ways:", options: { A: "Likelihood and size", B: "Likelihood and probability", C: "Likelihood and impact", D: "Likelihood and mitigation" }, correct: 'C', explanation: "Risks are typically assessed based on their likelihood (probability) of occurring and their potential impact (consequences) if they do occur." },
+            { question: "An effective risk management plan must address which of the following issues?", options: { A: "Risk avoidance", B: "Risk monitoring", C: "Contingency planning", D: "All of the above" }, correct: 'D', explanation: "A comprehensive plan includes strategies (like avoidance), monitoring processes, and fallback plans (contingency)." },
+            { question: "The main outcome of risk identifcation is to:", options: { A: "Identify and determine the relative importance of project risks", B: "Identify and describe all risks that might occur on the project", C: "Identify and determine the responses to project risks", D: "Identify and describe risks that have occurred on previous projects" }, correct: 'B', explanation: "The primary goal of identification is creating a list of potential risks. Prioritization (A) and response planning (C) come next." },
+            { question: "Project risk management is best described as:", options: { A: "Managing responses to threats", B: "Identifying and acknowledging threats and opportunities", C: "Planning responses to threats", D: "Minimizing threats and maximizing opportunities" }, correct: 'D', explanation: "Modern risk management considers both negative risks (threats) and positive risks (opportunities)." },
+            { question: "Because risks are unplanned events with negative repercussions, systematic risk management is an essential precondition for:", options: { A: "Project planning", B: "Quality management", C: "Achieving project goals", D: "Project budgeting" }, correct: 'C', explanation: "Managing risks is crucial for successfully achieving the overall project objectives despite uncertainties." },
+            { question: "“Anyone who runs a project without risk management is engaging in risky management.” Which risk should be rated as “very high” if identifed?", options: { A: "Deviation from budgeted project costs by plus 10%", B: "Negligible deviation from project scope (functional scope)", C: "Schedule overrun by 10% of project duration", D: "Project result not usable" }, correct: 'D', explanation: "A useless project result represents a total failure and thus carries the highest possible negative impact." },
+            { question: "The main aim of a project risk management process should be to:", options: { A: "Identify project risks and then manage them appropriately", B: "Identify all project risks and transfer them immediately", C: "Identify all the things that are threats or opportunities on a project", D: "Satisfy the organization’s project management process" }, correct: 'A', explanation: "The core purpose is to proactively identify and manage risks throughout the project lifecycle." },
+            // --- Section 5: Innovation and Entrepreneurship ---
+            { question: "Once a new product design becomes a dominant design, it:", options: { A: "Is adopted by the majority of producers", B: "Becomes no longer proftable", C: "Destabilizes the industry’s architecture for focus", D: "Becomes difcult for competitors to imitate" }, correct: 'A', explanation: "A dominant design sets a standard that most competitors converge upon." },
+            { question: "The frst entrants to sell in a new product or service category are referred to as:", options: { A: "Laggards", B: "Pioneers", C: "Early followers", D: "Early leaders" }, correct: 'B', explanation: "Pioneers or first movers are the initial entrants into a market." },
+            { question: "Ceramic Customs Corp. was forced to source a specifc ceramic from a single supplier because:", options: { A: "The supply was unlimited", B: "The supplier had more bargaining power than the frm", C: "The supply exceeded the demand", D: "The industry had barriers to entry" }, correct: 'B', explanation: "Being reliant on a single source gives that supplier significant bargaining power (a concept from Porter's Five Forces)." },
+            { question: "Africa Software Inc. is trying to estimate its installed base by assessing the number of:", options: { A: "Users of its software", B: "Areas in which its software can be applied", C: "Substitutes available for its software", D: "Developers working on its software" }, correct: 'A', explanation: "Installed base refers to the number of units of a product or service currently in use." },
+            { question: "Marine Systems was frst to develop an inventory management software for hotels and restaurants. Soon after, Unicorn Systems launched a similar product that outperformed the frst and became the market leader. Unicorn Systems is an example of a(n):", options: { A: "Late mover", B: "Eccentric laggard", C: "Early follower", D: "First pioneer" }, correct: 'C', explanation: "Early followers enter the market shortly after pioneers, often learning from their successes and failures." },
+            { question: "Technological innovations increase:", options: { A: "The gross domestic product of an economy", B: "Product life cycles", C: "The production costs of multiple product variations", D: "The time required for product development and introduction" }, correct: 'A', explanation: "Innovation drives productivity and economic growth, contributing to GDP." },
+            { question: "Digital cameras replaced flm cameras. Therefore, digital cameras are an example of:", options: { A: "Component innovation", B: "Incremental technology", C: "Discontinuous (radical) technology", D: "Modular innovation" }, correct: 'C', explanation: "This represents a fundamental shift in technology that disrupts the existing market, making it a discontinuous or radical innovation." },
+            { question: "Which of the following is true of technological innovations?", options: { A: "They increase production costs and reduce product differentiation", B: "They decrease the amount of output achievable from a given quantity of labor and capital", C: "They slow down product obsolescence and lengthen product development cycles", D: "They help increase a country’s gross domestic product" }, correct: 'D', explanation: "As mentioned before, innovation drives economic growth (GDP). Options A, B, and C are generally the opposite of what innovation does." },
+            { question: "Which of the following is an example of user innovation?", options: { A: "Sandra, an engineer, develops a device to track her teenage daughter’s car", B: "Ivan, a scientist, develops an anti-infammatory drug for company commercialization", C: "Samuel invents a detachable bicycle to sell to a bicycle manufacturer", D: "Jessica, a designer, is tasked with working on a temperature–sensitive fabric dye" }, correct: 'A', explanation: "User innovation comes from individuals solving their own needs, not as part of their job (B, D) or with the primary intent to sell to a manufacturer (C)." }
+        ];
+
+        // --- DOM Elements ---
+        const progressText = document.getElementById('progress');
+        const questionText = document.getElementById('question');
+        const optionsContainer = document.getElementById('options');
+        const feedbackText = document.getElementById('feedback');
+        const explanationText = document.getElementById('explanation');
+        const scoreDisplay = document.getElementById('score-display');
+        const nextButton = document.getElementById('next-button');
+        const quizArea = document.getElementById('quiz-area');
+        const finalScoreArea = document.getElementById('final-score-area');
+        const finalScoreText = document.getElementById('final-score');
+        const finalPercentageText = document.getElementById('final-percentage');
+        const restartButton = document.getElementById('restart-button');
+
+        // --- Quiz State ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        // --- Functions ---
+
+        /** Shuffles array elements in-place. ES6 version */
+        function shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        /** Starts or restarts the quiz. */
+        function startQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            shuffledQuestions = shuffle([...quizData]);
+            scoreDisplay.textContent = `Score: 0`;
+            finalScoreArea.classList.add('hidden');
+            quizArea.classList.remove('hidden');
+            nextButton.classList.add('hidden');
+            showQuestion();
+        }
+
+        /** Displays the current question and options. */
+        function showQuestion() {
+            optionsContainer.innerHTML = '';
+            feedbackText.textContent = '';
+            explanationText.textContent = '';
+            nextButton.classList.add('hidden');
+
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            progressText.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+            questionText.textContent = currentQuestion.question;
+
+            const options = Object.entries(currentQuestion.options).sort();
+
+            options.forEach(([key, value]) => {
+                const button = document.createElement('button');
+                button.textContent = `${key}) ${value}`;
+                button.dataset.key = key;
+                button.className = 'option-button block w-full text-left p-3 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition duration-200 text-gray-800';
+                button.addEventListener('click', () => selectAnswer(button, key, currentQuestion.correct, currentQuestion.explanation));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        /** Handles the user selecting an answer. */
+        function selectAnswer(selectedButton, selectedKey, correctKey, explanation) {
+            const allOptionButtons = optionsContainer.querySelectorAll('button');
+            allOptionButtons.forEach(btn => btn.disabled = true);
+
+            const isCorrect = selectedKey === correctKey;
+
+            if (isCorrect) {
+                score++;
+                selectedButton.classList.add('correct');
+                feedbackText.textContent = 'Correct!';
+                feedbackText.style.color = 'green';
+            } else {
+                selectedButton.classList.add('incorrect');
+                feedbackText.textContent = `Incorrect. The correct answer was ${correctKey}.`;
+                feedbackText.style.color = 'red';
+                const correctButton = optionsContainer.querySelector(`button[data-key="${correctKey}"]`);
+                if (correctButton) {
+                     correctButton.classList.add('correct');
+                }
+            }
+
+            if (explanation) {
+                explanationText.textContent = `Explanation: ${explanation}`;
+            }
+
+            scoreDisplay.textContent = `Score: ${score}`;
+            nextButton.classList.remove('hidden');
+        }
+
+        /** Moves to the next question or shows the final score. */
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                showQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        /** Displays the final score screen. */
+        function showFinalScore() {
+            quizArea.classList.add('hidden');
+            finalScoreArea.classList.remove('hidden');
+            const percentage = ((score / shuffledQuestions.length) * 100).toFixed(1);
+            finalScoreText.textContent = `Your final score is ${score} out of ${shuffledQuestions.length}.`;
+            finalPercentageText.textContent = `Percentage: ${percentage}%`;
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', startQuiz);
+        nextButton.addEventListener('click', showNextQuestion);
+        restartButton.addEventListener('click', startQuiz);
+
+        // --- End of Embedded JavaScript ---
+    </script>
+</body>
+</html>
